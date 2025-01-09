@@ -1,0 +1,16 @@
+python-decouple
+numpy
+pandas
+matplotlib
+plotly
+seaborn
+langchain
+langgraph
+langchain_openai
+langchain_community
+langchain-experimental
+streamlit
+sqlalchemy
+tabulate
+duckdb
+psycopg2

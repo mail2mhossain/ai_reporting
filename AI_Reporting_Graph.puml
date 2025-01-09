@@ -1,0 +1,65 @@
+@startuml Data Analysis
+
+    title       Reporting with LLM
+
+    !define RectangleNode(x) class x << (R,#ADD1B2) >>
+    !define DiamondNode(x) class x << (D,#ADD1B2) >>
+
+    START: start
+    dataset_detail : Get Dataset Details\n(Node)
+    query_relevancy_checker : Determine whether the user's query is relevant to this Data \n(ConditionalNode)
+    re_write_query : Rewrite the query to make it more specific, structured, and aligned with the schema provided.\n(Node)
+    select_table_list : Select table list
+    generate_sql_query : SQL query generator\n(Node)
+    sanitize_sql_query : Sanitize SQL query\n(ConditionalNode)
+    execute_sql_query : SQL query executer\n(Node)
+    make_sql_decision : Check SQL error\n(Node)
+    report_type : Get Report Type
+    sql_error_reports : Reports on SQL execution error
+    regenerate_sql_query : SQL query Re-generator.\n(Node)
+    Python_Code_Generation : Python code generator\n(Node)
+    sanitize_python_script : Python script sanitizer\n(ConditionalNode)
+    Code_Execution : Python code executer\n(Node)
+    Python_Code_Re_Generation : Python code re-generator\n(Node)
+    report_generation_decision : Check if there is is any error or not \n(Node)
+    Report_Generation : Report generator\n(Node)
+    END: End
+
+
+    START --> dataset_detail: (dataset_name, query)
+    dataset_detail --> query_relevancy_checker
+    query_relevancy_checker --> re_write_query: if query is relevant
+
+    re_write_query --> select_table_list: Table List for SQL Query
+    select_table_list --> generate_sql_query: Generate SQL Query
+
+    generate_sql_query --> sanitize_sql_query
+    sanitize_sql_query --> execute_sql_query: if SQL query is safe
+
+    execute_sql_query --> make_sql_decision: To check SQL error
+    make_sql_decision --> report_type: if NO SQL Error
+    make_sql_decision --> sql_error_reports: if sql_generation_try >= max_sql_generation_try
+    make_sql_decision --> regenerate_sql_query: if sql_generation_try < max_sql_generation_try
+
+    regenerate_sql_query --> sanitize_sql_query
+
+    report_type --> Python_Code_Generation
+
+    Python_Code_Generation --> sanitize_python_script
+    sanitize_python_script--> Code_Execution: If Python code is safe to execute
+    sanitize_python_script--> Python_Code_Re_Generation : If Python code is not safe to execute
+    sanitize_python_script--> END: If Python_script_check >= max_Python_script_check
+
+    Code_Execution --> report_generation_decision 
+    report_generation_decision --> Report_Generation : If no error in Python code execution
+    report_generation_decision --> Python_Code_Re_Generation : If error in Python code execution
+    report_generation_decision --> END: if Python_script_check >= max_Python_script_check
+    
+    Python_Code_Re_Generation --> sanitize_python_script
+
+    query_relevancy_checker --> END : if query is not relevant
+    sanitize_sql_query --> END :  If SQL query is not safe
+    Report_Generation --> END
+    sql_error_reports --> END
+
+@enduml
