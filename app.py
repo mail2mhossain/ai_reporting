@@ -27,7 +27,6 @@ load_dotenv()
 config = AutoConfig()
 data_directory = os.path.join(os.path.dirname(__file__), "data")
 
-json_file_path ="example_data_dictionary.json"
 # database_url = "postgresql://postgres:postgres@localhost/ChinookDB"
 
 # Initialize session states
@@ -257,10 +256,8 @@ def configure_database():
             if is_connection_ok(connection_string.strip()):
                 st.info("The connection string is valid.")
                 erd_path = get_temp_file(erd_image)
-                # with open(json_file_path, "r") as file:
-                #     data_dictionary = json.load(file)
-
-                data_dictionary =  generate_data_dictionary(erd_path)
+                with st.spinner("Generating data dictionary..."):
+                    data_dictionary =  generate_data_dictionary(erd_path)
                 data_dictionary = data_dictionary.model_dump() 
                 st.session_state["data"] = data_dictionary
                 st.session_state["data"]["db_name"]= db_name.strip()
@@ -318,11 +315,6 @@ def configure_database():
                 # Save Changes button
                 with col3:  # Place the button in the rightmost column
                     if st.button("Save Changes"):
-                        # Validate columns for missing values
-                        # all_rows_null = editable_df.isnull().all(axis=1).all()
-                        # if all_rows_null > 0:
-                        #     st.error(f"Validation failed: {all_rows_null} row(s) have missing values.")
-                        # Find rows where all values are null
                         rows_with_all_null = editable_df[editable_df.isnull().all(axis=1)]
 
                         # If there are any such rows, show error with row indices
@@ -363,17 +355,12 @@ def configure_database():
                         tables = [table for table in st.session_state["data"]["tables"]]
                         for table in tables:
                             if 'sample_data' not in table:
-                                # df = get_random_rows(connection_string.strip(), table['name'])
-                                # table["sample_data"] = df.to_dict(orient="records")
                                 apply_changes = False
                                 st.error(f"Sample data not found for table {table['name']}.")
 
-                        # Save changes to disk
                         if (apply_changes):
                             insert_db_info(st.session_state["data"])
-                            with open(json_file_path, "w") as file:
-                                json.dump(st.session_state["data"], file, indent=4)
-                            st.success(f"All changes applied and saved to {json_file_path}!")
+                            st.success(f"All changes applied and saved to DB!")
     
 
 

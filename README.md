@@ -2,8 +2,8 @@
 
 1. **Clone the source code from GitHub**:
    ```bash
-   git clone https://github.com/mail2mhossain/transforming_data_warehousing_with_LLMs.git
-   cd transforming_data_warehousing_with_LLMs
+   git clone https://github.com/mail2mhossain/ai_reporting.git
+   cd ai_reporting
    ```
 
 2. **Create a Conda environment (Assuming Anaconda is installed):**:
